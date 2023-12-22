@@ -1,6 +1,9 @@
 package app
 
 import (
+	"RouterBasics/domain"
+	"RouterBasics/service"
+	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -16,13 +19,12 @@ func Start() {
 
 	router := mux.NewRouter()
 
-	//define routes
-	router.HandleFunc("/greet", greet).Methods(http.MethodGet)
-	router.HandleFunc("/customers", getAllCustomers).Methods(http.MethodGet)
-	router.HandleFunc("/customers/{customer_id:[0-9]+}", GetCustomer).Methods(http.MethodGet)
+	//wiring
+	ch := CustomerHandlers{service.NewCustomerService(domain.NewCustomerRepositoryStub())}
 
-	router.HandleFunc("/customers", createCustomer).Methods(http.MethodPost)
+	//define routes
+	router.HandleFunc("/customers", ch.getAllCustomers).Methods(http.MethodGet)
 
 	//Starting server
-	http.ListenAndServe("localhost:8000", router)
+	log.Fatal(http.ListenAndServe("localhost:8000", router))
 }
