@@ -1,11 +1,11 @@
 package domain
 
 type Customer struct {
-	Id          string
+	Id          string `gorm:"column:customer_id"`
 	Name        string
 	City        string
 	Zipcode     string
-	DateofBirth string
+	DateofBirth string `gorm:"column:date_of_birth"`
 	Status      string
 }
 
