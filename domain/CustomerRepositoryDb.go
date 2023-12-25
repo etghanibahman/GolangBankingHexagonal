@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"RouterBasics/errs"
 	"RouterBasics/storage"
 	"log"
 	"os"
@@ -13,15 +14,45 @@ type CustomerRepositoryDb struct {
 	client *gorm.DB
 }
 
-func (d CustomerRepositoryDb) FindAll() ([]Customer, error) {
+func (d CustomerRepositoryDb) FindAll(status string) ([]Customer, *errs.AppError) {
 
 	customers := make([]Customer, 0)
-	d.client.Statement.Exec("select customer_id, name, city, zipcode, date_of_birth, status from customers").Find(&customers)
-	//d.client.Select("customer_id", "name", "city", "zipcode", "date_of_birth", "status").Find(&customers)
+	var err *gorm.DB
+	//d.client.Statement.Exec("select customer_id, name, city, zipcode, date_of_birth, status from customers").Find(&customers)
+	if status == "" {
+		err = d.client.Select("customer_id", "name", "city", "zipcode", "date_of_birth", "status").Find(&customers)
+	} else {
+		err = d.client.Select("customer_id", "name", "city", "zipcode", "date_of_birth", "status").Where("status = ?", status).Find(&customers)
+	}
 
-	log.Writer().Write([]byte(customers[len(customers)-1].Name))
-	log.Writer().Write([]byte(customers[len(customers)-1].DateofBirth))
+	if err.Error != nil {
+		if err.Error.Error() == "record not found" {
+			return nil, errs.NewNotFoundError("There is not any customer in the table!")
+		} else {
+			log.Println("Error while fetching customers" + err.Error.Error())
+			return nil, errs.NewUnexpectedError("unexpected database error")
+		}
+
+	}
 	return customers, nil
+}
+
+func (d CustomerRepositoryDb) ById(id string) (*Customer, *errs.AppError) {
+	var customer Customer
+
+	err := d.client.Where("customer_id = ?", id).First(&customer)
+
+	if err.Error != nil {
+		if err.Error.Error() == "record not found" {
+			log.Println("Customer not found error happened")
+			return nil, errs.NewNotFoundError("Customer not found")
+		} else {
+			log.Println("Error while scanning customer" + err.Error.Error())
+			return nil, errs.NewUnexpectedError("unexpected database error")
+		}
+
+	}
+	return &customer, nil
 }
 
 func NewCustomerRepositoryDb() CustomerRepositoryDb {
@@ -46,23 +77,3 @@ func NewCustomerRepositoryDb() CustomerRepositoryDb {
 
 	return CustomerRepositoryDb{db}
 }
-
-// func (d CustomerRepositoryDb) FindAll(status string) ([]Customer, *errs.AppError) {
-// 	var err error
-// 	customers := make([]Customer, 0)
-
-// 	if status == "" {
-// 		findAllSql := "select customer_id, name, city, zipcode, date_of_birth, status from customers"
-// 		err = d.client.Select(&customers, findAllSql)
-// 	} else {
-// 		findAllSql := "select customer_id, name, city, zipcode, date_of_birth, status from customers where status = ?"
-// 		err = d.client.Select(&customers, findAllSql, status)
-// 	}
-
-// 	if err != nil {
-// 		logger.Error("Error while querying customers table " + err.Error())
-// 		return nil, errs.NewUnexpectedError("Unexpected database error")
-// 	}
-
-// 	return customers, nil
-// }
