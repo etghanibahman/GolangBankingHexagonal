@@ -2,6 +2,7 @@ package domain
 
 import (
 	"RouterBasics/errs"
+	"RouterBasics/logger"
 	"RouterBasics/storage"
 	"log"
 	"os"
@@ -29,7 +30,7 @@ func (d CustomerRepositoryDb) FindAll(status string) ([]Customer, *errs.AppError
 		if err.Error.Error() == "record not found" {
 			return nil, errs.NewNotFoundError("There is not any customer in the table!")
 		} else {
-			log.Println("Error while fetching customers" + err.Error.Error())
+			logger.Error("Error while fetching customers" + err.Error.Error())
 			return nil, errs.NewUnexpectedError("unexpected database error")
 		}
 
@@ -44,10 +45,10 @@ func (d CustomerRepositoryDb) ById(id string) (*Customer, *errs.AppError) {
 
 	if err.Error != nil {
 		if err.Error.Error() == "record not found" {
-			log.Println("Customer not found error happened")
+			logger.Error("Customer not found error happened")
 			return nil, errs.NewNotFoundError("Customer not found")
 		} else {
-			log.Println("Error while scanning customer" + err.Error.Error())
+			logger.Error("Error while scanning customer" + err.Error.Error())
 			return nil, errs.NewUnexpectedError("unexpected database error")
 		}
 

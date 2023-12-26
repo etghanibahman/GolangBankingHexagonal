@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"RouterBasics/logger"
 	"fmt"
 
 	"gorm.io/driver/postgres"
@@ -23,6 +24,7 @@ func NewConnection(config *Config) (*gorm.DB, error) {
 	)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
+		logger.Error("There is an error in connection to the database")
 		return db, err
 	}
 	return db, nil

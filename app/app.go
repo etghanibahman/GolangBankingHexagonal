@@ -2,8 +2,8 @@ package app
 
 import (
 	"RouterBasics/domain"
+	"RouterBasics/logger"
 	"RouterBasics/service"
-	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -28,5 +28,9 @@ func Start() {
 	router.HandleFunc("/customers/{customer_id:[0-9]+}", ch.getCustomer).Methods(http.MethodGet)
 
 	//Starting server
-	log.Fatal(http.ListenAndServe("localhost:8000", router))
+	//log.Fatal(
+	err := http.ListenAndServe("localhost:8000", router)
+
+	logger.Fatal(err.Error())
+	//)
 }
