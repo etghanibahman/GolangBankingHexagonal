@@ -9,13 +9,21 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type Customer struct {
-	Name    string `json:"full_name" xml:"name"`
-	City    string `json:"city" xml:"city"`
-	Zipcode string `json:"zip_code" xml:"zipcode"`
-}
+// set SERVER_ADDRESS=localhost
+// set SERVER_PORT=8082
+// export SERVER_ADDRESS=localhost
+// SERVER_ADDRESS=localhost SERVER_PORT=8082 go run main.go
+//	go run SERVER_ADDRESS=localhost SERVER_PORT=8082 main.go
+// func sanityCheck() {
+// 	logger.Info(os.Getenv("GOPATH"))
+// 	if os.Getenv("SERVER_ADDRESS") == "" || os.Getenv("SERVER_PORT") == "" {
+// 		logger.Fatal("Enivironment variable is not defined...")
+// 	}
+// }
 
 func Start() {
+
+	//sanityCheck()
 
 	router := mux.NewRouter()
 
@@ -28,9 +36,10 @@ func Start() {
 	router.HandleFunc("/customers/{customer_id:[0-9]+}", ch.getCustomer).Methods(http.MethodGet)
 
 	//Starting server
-	//log.Fatal(
+	// address := os.Getenv("SERVER_ADDRESS")
+	// port := os.Getenv("SERVER_PORT")
+	// log.Fatal(http.ListenAndServe(fmt.Sprintf("%s:%s", address, port), router))
 	err := http.ListenAndServe("localhost:8000", router)
 
 	logger.Fatal(err.Error())
-	//)
 }
