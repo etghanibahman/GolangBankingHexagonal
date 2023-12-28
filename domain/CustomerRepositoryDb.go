@@ -3,11 +3,7 @@ package domain
 import (
 	"RouterBasics/errs"
 	"RouterBasics/logger"
-	"RouterBasics/storage"
-	"log"
-	"os"
 
-	"github.com/joho/godotenv"
 	"gorm.io/gorm"
 )
 
@@ -56,25 +52,25 @@ func (d CustomerRepositoryDb) ById(id string) (*Customer, *errs.AppError) {
 	return &customer, nil
 }
 
-func NewCustomerRepositoryDb() CustomerRepositoryDb {
+func NewCustomerRepositoryDb(db *gorm.DB) CustomerRepositoryDb {
 
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatal(err)
-	}
-	config := &storage.Config{
-		Host:     os.Getenv("DB_HOST"),
-		Port:     os.Getenv("DB_PORT"),
-		Password: os.Getenv("DB_PASS"),
-		User:     os.Getenv("DB_USER"),
-		SSLMode:  os.Getenv("DB_SSLMODE"),
-		DBName:   os.Getenv("DB_NAME"),
-	}
+	// err := godotenv.Load(".env")
+	// if err != nil {
+	// 	logger.Fatal(err.Error())
+	// }
+	// config := &storage.Config{
+	// 	Host:     os.Getenv("DB_HOST"),
+	// 	Port:     os.Getenv("DB_PORT"),
+	// 	Password: os.Getenv("DB_PASS"),
+	// 	User:     os.Getenv("DB_USER"),
+	// 	SSLMode:  os.Getenv("DB_SSLMODE"),
+	// 	DBName:   os.Getenv("DB_NAME"),
+	// }
 
-	db, err := storage.NewConnection(config)
-	if err != nil {
-		log.Fatal("could not load the database")
-	}
+	// db, err := storage.NewConnection(config)
+	// if err != nil {
+	// 	logger.Fatal("could not load the database")
+	// }
 
 	return CustomerRepositoryDb{db}
 }
